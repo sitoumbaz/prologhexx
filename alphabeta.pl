@@ -28,7 +28,7 @@ alphabeta(Pos, Alpha, Beta, GoodPos, Val, Depth) :-
 
 
 alphabeta(Pos, Alpha, Beta, GoodPos, Val, Depth) :-
-      	staticval(Pos, Val).
+      staticval(Pos, Val).
 
 
 
@@ -85,14 +85,14 @@ max_to_move(pos(NextToMove, _, _)) :-
 min_to_move(Pos) :-
 	not max_to_move(Pos).
 
-
+/*
 moves(Pos, PosList, 1, LMoves) :-
 	list_to_pos(Pos, 1),
 	next_to_move(1, NextToMove),
 	get_best_move(1, NextToMove, LMoves),
 	retract_pos(1),
 	create_pos_list_from_moves_list(Pos, LMoves, PosList), !.
-
+*/
 
 
 moves(Pos, PosList, Depth, LMoves) :-
@@ -102,20 +102,20 @@ moves(Pos, PosList, Depth, LMoves) :-
 	retract_pos(1),
 	create_pos_list_from_moves_list(Pos, LMoves, PosList).
 
-
+/*
 get_best_move(Index, NextToMove, LMoves) :-
 	get_all_moves_sorted(Index, NextToMove, LAllMoves),
 	get_first_from_list(LAllMoves, LMoves).
 
 get_first_from_list([], []) :- !.
 get_first_from_list([Move | LAllMoves], [Move]) :- !.
-	
+*/	
 	
 
 create_pos_list_from_moves_list(Pos, [[_, move(_, FX, FY, TX, TY)] | LMoves], [Pos1 | PosList]) :-
 	list_to_pos(Pos, 2),
 	make_move(2, FX, FY, TX, TY),
-	position_value1(2, Val),
+	position_value(2, Val),
 	pos_to_list(2, Pos1, Val),
 	retract_pos(2),
 	create_pos_list_from_moves_list(Pos, LMoves, PosList), !.

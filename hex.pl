@@ -144,7 +144,7 @@ change_colors :-
 	board_size(3),
 	change_hex_state(0, 3, 1, first),
 	change_hex_state(0, 3, 9, second),
-	change_hex_state(0, 3, 5, none).
+	change_hex_state(0, 3, 5, none), !.
 
 
 change_colors :-
@@ -284,7 +284,7 @@ create_metadata_list(LMetadata) :-
 	number_string(SecondCount, SecondCountStr),
 	number_string(EmptyCount, EmptyCountStr),
 	DisNextTurnText is DisFromBorderSecond - 15,
-		position_value1(0, Val),
+		position_value(0, Val),
 		number_string(Val, ValStr),
 	LMetadata = [fore(CTextR, CTextG, CTextB),
 		     pen(CBorderR, CBorderG, CBorderB, 2),
@@ -427,6 +427,8 @@ remove_0_moves_rec([[R, Move] | LAllMoves], [[R, Move] | LMoves]) :-
 
 get_all_moves_sorted(Index, Player, LSortedMoves) :-
 	get_all_moves(Index, Player, LAllMoves),
+	length(LAllMoves, Len),
+	Len > 0,
 %	remove_0_moves_rec(LAllMoves, LMoves),
 %	sort(LMoves, LSortedMovesReversed),
 	sort(LAllMoves, LSortedMovesReversed),
@@ -492,6 +494,42 @@ has_moves(Index, Player) :-
 	close_neighbour_hex(Index, FX, FY, TX, TY, empty), !.
 
 
+
+
+calc_position_hex(Index, NextToMoveCount, OtherPlayerCount, EmptyCount) :-
+	next_to_move(0, NextToMove),
+	other_player(NextToMove, OtherPlayer),
+	findall(_, hex(Index, _, _, NextToMove), LNextToMove),
+	length(LNextToMove, NextToMoveCount),
+	findall(_, hex(Index, _, _, OtherPlayer), LOtherPlayer),
+	length(LOtherPlayer, OtherPlayerCount),
+	findall(_, hex(Index, _, _, empty), LEmpty),
+	length(LEmpty, EmptyCount).
+
+position_value(Index, Val) :-
+	calc_position_hex(Index, NextToMoveCount, OtherPlayerCount, EmptyCount),
+	position_value_inner(Index, NextToMoveCount, OtherPlayerCount, EmptyCount, Val).
+
+
+position_value_inner(Index, NextToMoveCount, OtherPlayerCount, 0 /*EmptyCount*/, Val) :-
+	calc_end_game_val(NextToMoveCount, OtherPlayerCount, Val), !.
+
+position_value_inner(Index, NextToMoveCount, OtherPlayerCount, EmptyCount, Val) :-
+	next_to_move(0, NextToMove),
+	not has_moves(Index, NextToMove),		% the next player to move has no moves.
+	Val is NextToMoveCount - OtherPlayerCount - EmptyCount, !.
+
+
+position_value_inner(Index, NextToMoveCount, OtherPlayerCount, EmptyCount, Val) :-
+	next_to_move(0, NextToMove),
+	other_player(NextToMove, OtherPlayer),
+	not has_moves(Index, OtherPlayer),		% the other player to move has no moves.
+	Val is NextToMoveCount - OtherPlayerCount + EmptyCount, !.
+
+position_value_inner(Index, NextToMoveCount, OtherPlayerCount, EmptyCount, Val) :-
+	Val is NextToMoveCount - OtherPlayerCount, !.
+
+/*
 position_value1(Index, Val) :-
 	next_to_move(0, NextToMove),
 	other_player(NextToMove, OtherPlayer),
@@ -541,7 +579,7 @@ position_value1(Index, Val) :-
 	findall(_, hex(Index, _, _, OtherPlayer), LOtherPlayer),
 	length(LOtherPlayer, OtherPlayerCount),
 	Val is NextToMoveCount - OtherPlayerCount, !.
-
+*/
 
 % The next to move player won.
 calc_end_game_val(ValNext, ValOther, Val) :-
@@ -665,7 +703,7 @@ check_winner(FirstCount, SecondCount, Msg) :-
 
 
 play_best_move :-
-	position_value1(0, PosVal),
+	position_value(0, PosVal),
 	pos_to_list(0, CurrPos, PosVal),
 	start_infinity(Inf),
 	MInf is -Inf,
