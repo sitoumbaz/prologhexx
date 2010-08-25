@@ -1,8 +1,7 @@
-start_game :- show_options.
 
 
 /************************************************************************
-** This creates a dialog for choosing options for reversi: board size,
+** This creates a dialog for choosing options for hexxagon: board size,
 ** who will start the game (computer or human) and depth of search in
 ** game tree.
 ************************************************************************/
@@ -38,73 +37,23 @@ show_options :-
 	window_handler(options, options_handler),
 	call_dialog(options, Result).
 
-/************************************************************************
-** handle the non-terminal messages from the options dialog
-************************************************************************/
-
-
-%options_handler((options, 13), msg_leftdown, _, _) :-
-%	msgbox('Hexxagon', 'At least one of the players has to be human.', 0, _).	
-
-
-
-
-
-
-
-% if chose to close, get the dialog values
-
-%options_handler(options, msg_close, Data, close) :-
-%	GetValues.
-
-% if chose to close, and values weren't valid show options again
-%options_handler( options, msg_close , Data, close):-
-%  show_options.  
-
-% if pressed 'Start game' close window, if dialog values are valid
-%options_handler((options, 15), msg_button, _, close) :-
-%	getDlgValues.
-
-% if pressed 'Start game' and dialog values aren't valid, don't do anything
-%options_handler((options, 15), msg_button, _, _).
-
-
-
-%options_handler((options, 14), msg_button, _, close) :-
-%	fail.
-
-
-/*********************************************************************
-** handle the messages from the reversi board dialog
-*********************************************************************/
-
 % on a close message close the dialog by binding the fourth argument
-
 options_handler(options, msg_close, Data, close).
-%	msgbox('Hexxagon - Exit', 'Hope you enjoyed the game', 0, _).
 
 % for all other messages do not close the dialog
-% pass the window, message and data on to reversi_handler/3.
 
 % I added handler for the new exit button.
 options_handler((options, 14), msg_button, _, close).
-%	msgbox('Hexxagon - Exit', 'Hope you enjoyed the game', 0, _).
-
-%options_handler(Win, Msg, Data, Result) :-
-%	options_handler(Win, Msg, Data).
-
 
 options_handler((options, 15), msg_button, _, close) :-
 	getDlgValues.
-%	show_hex.
 
 options_handler((options, 15), msg_button, _, _).
-
 
 options_handler(Window, Message, Data, Result) :-
 	window_handler(Window, Message, Data, Result).
 
-
+% getting the board size that was selected in the dialog.
 getBoardSize :-
 	wndhdl((options, 10), GroupHandleSize),
 	wbtnsel((GroupHandleSize, 1), Checked),
@@ -123,8 +72,7 @@ getBoardSize :-
   	Checked = 1, !,
   	assert(board_size(7)).
 
-%%%%%%%%%%
-
+% Getting the game level that was selected in the dialog.
 getLevel :-
 	wndhdl((options, 11), GroupHandleLevel),
 	wbtnsel((GroupHandleLevel, 1), Checked),
@@ -143,9 +91,7 @@ getLevel :-
   	Checked = 1, !,
   	assert(gameLevel(3)).
 
-%%%%%%%%%%%%%%%
-
-
+% Getting the first player (Human, computer)
 getFirstPlayer :-
 	wndhdl((options, 12), GroupHandleFirstPlayer),
 	wbtnsel((GroupHandleFirstPlayer, 1), Checked),
@@ -159,14 +105,12 @@ getFirstPlayer :-
   	assert(firstPlayer(computer)).
 
 
-%%%%%%%%%%%%%%%%%%
-
+% Getting the second player (Human, computer)
 getSecondPlayer :-
 	wndhdl((options, 13), GroupHandleSecondPlayer),
 	wbtnsel((GroupHandleSecondPlayer, 1), Checked),
   	Checked = 1, !,
   	assert(secondPlayer(human)).
-
 
 getSecondPlayer :-
 	wndhdl((options, 13), GroupHandleSecondPlayer),
@@ -175,27 +119,14 @@ getSecondPlayer :-
   	assert(secondPlayer(computer)).
 
 
-
-
-
-%%%%%%%%%%%%%%%%%
-
+% Getting the status of the player
 player_check(first, Status) :-
 	firstPlayer(Status).
 
 player_check(second, Status) :-
 	secondPlayer(Status).
 
-
-
-check(A, B, C, D) :-
-	board_size(A),
-	gameLevel(B),
-	firstPlayer(C),
-	secondPlayer(D).
-
-
-
+% Getting the values from the dialog.
 getDlgValues :-
 	retractAllValues,
 	getBoardSize,
@@ -204,8 +135,7 @@ getDlgValues :-
 	getSecondPlayer,
 	checkTwoComputers, !.
 
-
-
+% Checking that not both of the players are computers
 checkTwoComputers :-
 	findHumanPlayer.
 
@@ -213,21 +143,19 @@ checkTwoComputers :-
 	msgbox('Hexxagon', 'At least one of the players has to be human.', 0, _),
 	fail.
 
+% Looking for human player.
 findHumanPlayer :-
 	firstPlayer(human).
 
 findHumanPlayer :-
 	secondPlayer(human).
 
-
-
-
+% Removing all values of the game that are suppose to be selected in the options dialog.
 retractAllValues :-
 	retractBoardSize,
 	retractLevel,
 	retractFirstPlayer,
 	retractSecondPlayer, !.
-
 
 retractBoardSize :-
 	retractall(board_size(_)).
@@ -244,26 +172,4 @@ retractFirstPlayer.
 retractSecondPlayer :-
 	retractall(secondPlayer(_)).
 retractSecondPlayer.
-
-
-
-% determine the first player to play.
-% if here than human plays first
-
-%determine_first_player:-
-%  wndhdl((options,5), GroupHandle),
-%  wbtnsel((GroupHandle,1), Checked),
-%  Checked = 1,
-%  assert(first_player(human)).
-
-% determine the first player to play.
-% if here than prolog plays first
-
-%determine_first_player:-
-%  wndhdl((options,5), GroupHandle),
-%  wbtnsel((GroupHandle,2), Checked),
-%  Checked  = 1,
-%  assert(first_player(prolog)).
-
-
 
