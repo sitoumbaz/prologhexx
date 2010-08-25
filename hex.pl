@@ -316,7 +316,6 @@ create_metadata_list(LMetadata) :-
 %create_moves_commands(LMovesCommands),
 
 
-
 close_neighbour_hex(Index, X, Y, NX, NY, State) :-
 	(NX is X,     NY is Y + 2, hex(Index, NX, NY, State));
 	(NX is X + 1, NY is Y + 1, hex(Index, NX, NY, State));
@@ -463,7 +462,8 @@ create_close_moves([pos(Index, X, Y) | LPos], Player, [[Result, move(Index, FX, 
 
 
 get_one_close_neighbour(Index, TX, TY, Player, [_, move(Index, FX, FY, TX, TY)]) :-			%***
-	close_neighbour_hex(Index, TX, TY, FX, FY, Player), !.
+	!, close_neighbour_hex(Index, TX, TY, FX, FY, Player).
+
 
 
 
@@ -517,14 +517,18 @@ position_value_inner(Index, NextToMoveCount, OtherPlayerCount, 0 /*EmptyCount*/,
 position_value_inner(Index, NextToMoveCount, OtherPlayerCount, EmptyCount, Val) :-
 	next_to_move(0, NextToMove),
 	not has_moves(Index, NextToMove),		% the next player to move has no moves.
-	Val is NextToMoveCount - OtherPlayerCount - EmptyCount, !.
+	OtherPlayerCountNew is OtherPlayerCount + EmptyCount,
+	calc_end_game_val(NextToMoveCount, OtherPlayerCountNew, Val), !.
+	%Val is NextToMoveCount - OtherPlayerCount - EmptyCount, !.
 
 
 position_value_inner(Index, NextToMoveCount, OtherPlayerCount, EmptyCount, Val) :-
 	next_to_move(0, NextToMove),
 	other_player(NextToMove, OtherPlayer),
 	not has_moves(Index, OtherPlayer),		% the other player to move has no moves.
-	Val is NextToMoveCount - OtherPlayerCount + EmptyCount, !.
+	NextToMoveCountNew is NextToMoveCount + EmptyCount,
+	calc_end_game_val(NextToMoveCountNew, OtherPlayerCount, Val), !.
+	%Val is NextToMoveCount - OtherPlayerCount + EmptyCount, !.
 
 position_value_inner(Index, NextToMoveCount, OtherPlayerCount, EmptyCount, Val) :-
 	Val is NextToMoveCount - OtherPlayerCount, !.
@@ -584,13 +588,14 @@ position_value1(Index, Val) :-
 % The next to move player won.
 calc_end_game_val(ValNext, ValOther, Val) :-
 	ValNext > ValOther,
-	infinity(Val), !.
+	infinity(Inf),
+	Val is Inf + ValNext - ValOther, !.
 
 % The next to move player lost.
 calc_end_game_val(ValNext, ValOther, Val) :-
 	ValNext < ValOther,
 	infinity(Inf),
-	Val is -Inf, !.
+	Val is -Inf + ValNext - ValOther, !.
 
 % a tie game.
 calc_end_game_val(Count, Count, 0).
