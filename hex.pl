@@ -5,7 +5,7 @@ color(red, [255, 125, 125]).
 color(blue, [125, 125, 255]).
 color(yellow, [255, 255, 0]).
 color(white, [255, 255, 255]).
-color(purple, [150, 25, 175]).
+color(purple, [225, 200, 240]).
 color(green, [0, 255, 0]).
 color(gray,  [175, 175, 175]).
 color(orange,  [230, 255, 0]).
@@ -80,18 +80,19 @@ show_hex :-
 	show_options,
 	init_data,
 	calc_window_size(WindowWidth, WindowHeight),
-	DialogHeight is WindowHeight + 100,
+	DialogHeight is WindowHeight + 70,
   	wdcreate(hex, `Prolog - Hexxagon`, 100, 100, WindowWidth, DialogHeight, DStyle),
   	wccreate((hex,1), grafix, ``, 0, 0, WindowWidth, WindowHeight, CStyle),
 	wgfxmap((hex, 1), 1, 1, 1, 1),
 	wsize((hex, 1), X, Y, X1, Y1),
 	window_handler(hex, hex_handler),
 	insert_all_hex(HexList),
-	YYY is WindowHeight + 5,
-	wccreate((hex, 2), button, `Move`, 10, YYY, 200, 26, CStyle),
-	YYYY is YYY + 30,
-	wccreate((hex, 3), button, `New Game`, 10, YYYY, 100, 26, CStyle),
-	wccreate((hex, 4), button, `Exit`, 120, YYYY, 100, 26, CStyle),
+	ButtonY is WindowHeight + 5,
+	ButtonWidth is WindowWidth - 25,
+%	wccreate((hex, 2), button, `Move`, 10, YYY, 200, 26, CStyle),
+%	YYYY is YYY + 30,
+	wccreate((hex, 3), button, `End Game`, 10, ButtonY, ButtonWidth, 26, CStyle),
+%	wccreate((hex, 4), button, `Exit`, 120, YYYY, 100, 26, CStyle),
 	change_colors,
 	show_dialog(hex),
 	retractall(hex(_, X, Y, State)),
@@ -638,17 +639,17 @@ sqrt3(1.7320508075688772935274463415059).
 
 hex_handler(hex, msg_close, Data, close).
 
-
+/*
 hex_handler((hex, 4), msg_button, _, close) :-
 	msgbox(`Hexxagon - Exit`, `Are you sure you want to exit the game ?`, 36, Ans),
 	Ans = 6,	% Yes pressed.
 	show_score.
-
+*/
 
 
 
 hex_handler((hex, 3), msg_button, _, close) :-
-	msgbox(`Hexxagon`, `Are you sure you want to end this game and start a new one ?`, 36, Ans ),
+	msgbox(`Hexxagon`, `Are you sure you want to end this game?`, 36, Ans ),
 	Ans = 6,	% Yes pressed.
 	show_score,
 	wclose(hex),
@@ -666,11 +667,11 @@ refresh_board :-
 	create_board_commands(Commands),
 	wgfx((hex, 1), Commands).
 
-
+/*
 hex_handler((hex, 2), msg_button, _) :-
 	play_best_move,
 	play_next.
-
+*/
 
 
 show_score :-
