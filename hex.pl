@@ -1,21 +1,21 @@
 
 
 color(black, [0, 0, 0]).
-color(red, [255, 125, 125]).
+color(red, [255, 83, 169]).
 color(blue, [125, 125, 255]).
 color(yellow, [255, 255, 0]).
 color(white, [255, 255, 255]).
 color(purple, [225, 200, 240]).
 color(green, [0, 255, 0]).
 color(gray,  [175, 175, 175]).
-color(orange,  [230, 255, 0]).
+color(orange,  [255, 188, 155]).
 
 
 color_first(red).
 color_second(blue).
 color_border(black).
 color_empty(gray).
-color_none(purple).
+color_none(orange).
 color_close_neighbour(green).
 color_far_neighbour(yellow).
 color_selected_hex(yellow).
@@ -164,8 +164,30 @@ change_colors :-
 change_colors :-
 	board_size(7),
 	change_hex_state(0, 7, 1, first),
+	change_hex_state(0, 1, 19, first),
+	change_hex_state(0, 13, 19, first),
 	change_hex_state(0, 1, 7, second),
-	change_hex_state(0, 7, 7, none).
+	change_hex_state(0, 13, 7, second),
+	change_hex_state(0, 7, 25, second),
+	change_hex_state(0, 7, 5, none),
+	change_hex_state(0, 6, 6, none),
+	change_hex_state(0, 8, 6, none),
+	change_hex_state(0, 3, 9, none),
+	change_hex_state(0, 3, 11, none),
+	change_hex_state(0, 4, 8, none),
+	change_hex_state(0, 11, 9, none),
+	change_hex_state(0, 11, 11, none),
+	change_hex_state(0, 10, 8, none),
+	change_hex_state(0, 3, 17, none),
+	change_hex_state(0, 3, 15, none),
+	change_hex_state(0, 4, 18, none),
+	change_hex_state(0, 11, 17, none),
+	change_hex_state(0, 11, 15, none),
+	change_hex_state(0, 10, 18, none),
+	change_hex_state(0, 7, 21, none),
+	change_hex_state(0, 6, 20, none),
+	change_hex_state(0, 8, 20, none),
+	change_hex_state(0, 7, 13, none), !.
 
 %	change_selected_hex(8, 8).
 
